@@ -2,14 +2,15 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Components from "./pages/index";
 
-const { Login, Register } = Components;
 export default () => {
-  <>
+  const { Login, Register } = Components; // Destructuring
+  return (
     <BrowserRouter>
       <Routes>
-        <Route exact path="/" component={Login} />
-        {/* <Route exact path="/register" component={Register} /> */}
+        <Route exact path="/" element={<Login/>} /> 
+        <Route exact path="/register" element={<Register />} />
+        <Route path="*" element={<Login/>} /> 
       </Routes>
     </BrowserRouter>
-  </>;
+  )
 };
