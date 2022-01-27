@@ -7,5 +7,3 @@ export default {
     Register,
     Recorder
 }
-
-export default Vals;

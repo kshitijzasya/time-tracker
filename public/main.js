@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const screenProcess = require('./process/screenshot');
 
 function createWindow () {
   // Create the browser window.
@@ -10,9 +11,9 @@ function createWindow () {
     // frame: false, // remove the window frame
     webPreferences: {
       nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
       // enableRemoteModule:true,
-      // contextIsolation: false
+      contextIsolation: false
     }
   })
 console.log('dirnme', path.join(__dirname, 'preload.js'))
@@ -20,13 +21,13 @@ console.log('dirnme', path.join(__dirname, 'preload.js'))
   win.loadURL('http://localhost:3000');
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  win.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(createWindow)
+app.on('ready', function() { createWindow()})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -51,6 +52,16 @@ app.on('activate', () => {
 
 
 //Listener
-ipcMain.on('tracking:start',(event, arg) => {
-  console.log('main file', {event,arg})
+ipcMain.on('tracking',(event, arg) => {
+  console.log('main file', arg);
+  screenProcess.startTakingScreenshots();
+  event.reply('reply', 'pong')
+});
+
+
+//Handle unhandled rejections
+process.on('unhandledRejection', (reason, p) => {
+  console.log('unhandled rtej: ', reason);
+  //send in the calvary
+  return
 })
