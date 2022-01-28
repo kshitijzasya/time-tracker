@@ -7,19 +7,25 @@ import {
 } from 'react-bootstrap';
 //Import API calls
 import Calls from "../../../helpers/apicalls";
+import { useNavigate } from "react-router-dom";
 
 const Login = _ => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  let navigate = useNavigate();
+
   const submitLoginForm = async(e) => {
-    Calls.GET('login')
     e.preventDefault();
+    
+    // console.log(await Calls.GET('login'))
     if ( email === '' || password === '' ) {
       console.log('Please fill in all fields');
-      return false;
+      // return false;
     }
-    let response = await Calls.POST('login', {email, password});
+    //Send response for login
+    // let response = await Calls.POST('login', {email, password});
+    navigate('/projects');
   }
   return (
     <>

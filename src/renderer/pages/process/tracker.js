@@ -22,9 +22,6 @@ const stopRecording = _ => {
 }
 
 const Recorder = () => {
-  // const [recorder, setRecorder] = useState(0);
-  // const [interval, updateInterval] = useState(0);
-
   useEffect(_ => {
     //Set effects for the interval
   }, [])
