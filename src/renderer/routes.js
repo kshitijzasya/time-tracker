@@ -3,14 +3,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Components from "./pages/index";
 
 const { Login, Register, Recorder } = Components;
-export default () => { console.log('insinde routes')
+export default () => { 
   return (
     <>
     <BrowserRouter>
       <Routes>
-        {/* <Route exact path="/" element={<Login />} /> */}
-        <Route path="*" element={<Recorder />} />
-        {/* <Route exact path="/register" component={Register} /> */}
+        <Route exact path="/" element={<Login />} />
+        <Route exact path="/rracking" element={<Recorder />}/>
+        <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>
   </>

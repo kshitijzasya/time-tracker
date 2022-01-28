@@ -3,14 +3,16 @@ const fs = require('fs');
 const path = require * ('path');
 const os = require('os');
 
+var count = 0;
 /**
  * Start taking screenshots
- * @param interval
+ * @param type
 */
-const startTakingScreenshots = (type, interval) => {
+const startTakingScreenshots = (type) => {
     try {
         let screenSize = screen.getPrimaryDisplay().workAreaSize;
-        desktopCapturer.getSources({ types: ['screen'], thumbnailSize: screenSize }).then(async sources => {
+        console.log('start taking screenshots....')
+        return desktopCapturer.getSources({ types: ['screen'], thumbnailSize: screenSize }).then(async sources => {
             // let sourceId = sources[0].id;
             return handleStream(sources[0].thumbnail.toDataURL());
         })
@@ -25,7 +27,7 @@ const handleStream = async (stream) => {
     var ext = matches[1];
     var data = matches[2];
     var buffer = Buffer.from(data, 'base64');
-    return fs.writeFileSync(`${__dirname}/../screenshot.${ext}`, buffer, function (err) {
+    fs.writeFileSync(`${__dirname}/../../../public/screenshots/screenshot-${count++}.${ext}`, buffer, function (err) {
         console.log('error in writing file', err);
     })
 }
