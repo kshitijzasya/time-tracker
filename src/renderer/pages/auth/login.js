@@ -18,14 +18,17 @@ const Login = _ => {
   const submitLoginForm = async(e) => {
     e.preventDefault();
     
-    // console.log(await Calls.GET('login'))
+    console.log(await Calls.GET('tracker/login'))
     if ( email === '' || password === '' ) {
       console.log('Please fill in all fields');
-      // return false;
+      return false;
     }
     //Send response for login
-    // let response = await Calls.POST('login', {email, password});
-    navigate('/projects');
+    let response = await Calls.POST('tracker/login', {email, password});
+    if (response.status){
+      console.log('localstorage', window.localStorage)
+      // navigate('/projects');
+    }
   }
   return (
     <>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+
 //Renderer
 const renderer = window.ipcRenderer;
-//setting value for interval
-var recorder;
 
 const startRecording = _ => {
   console.log('startRecording');
@@ -30,6 +30,7 @@ const Recorder = () => {
       <div className="container">
         <div className="">
           <p>Screen Capturer</p>
+          <Link to="/projects">back</Link>
           <Button variant="primary" onClick={startRecording}>Primary</Button>
           <Button variant="danger" onClick={stopRecording}>Primary</Button>
         </div>

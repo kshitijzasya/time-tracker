@@ -10,6 +10,7 @@ export default () => {
       <Routes>
         <Route exact path="/" element={<Login />} />
         <Route exact path="/projects" element={<Projects />} />
+        <Route exact path="/projects/:id" element={<Recorder />} />
         <Route exact path="/tracking" element={<Recorder />}/>
         <Route path="*" element={<Login />} />
       </Routes>
