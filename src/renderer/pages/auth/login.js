@@ -8,6 +8,7 @@ import {
 //Import API calls
 import Calls from "../../../helpers/apicalls";
 import { useNavigate } from "react-router-dom";
+import authentication from '../../../helpers/authentication';
 
 const Login = _ => {
   const [email, setEmail] = useState('');
@@ -18,16 +19,17 @@ const Login = _ => {
   const submitLoginForm = async(e) => {
     e.preventDefault();
     
-    console.log(await Calls.GET('tracker/login'))
+    console.log(await Calls.GET('login'))
     if ( email === '' || password === '' ) {
       console.log('Please fill in all fields');
       return false;
     }
     //Send response for login
-    let response = await Calls.POST('tracker/login', {email, password});
-    if (response.status){
-      console.log('localstorage', window.localStorage)
-      // navigate('/projects');
+    let response = await Calls.POST('login', {email, password}); console.log('response', response)
+    if (response.status === 200){
+      let { id } = response.data; 
+      authentication.userId = id;
+      navigate('/projects');
     }
   }
   return (
