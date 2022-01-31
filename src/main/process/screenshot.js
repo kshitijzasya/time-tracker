@@ -9,29 +9,38 @@ var count = 0;
  * @param type
 */
 const startTakingScreenshots = (type) => {
-    try {
-        let screenSize = screen.getPrimaryDisplay().workAreaSize;
-        console.log('start taking screenshots....')
-        return desktopCapturer.getSources({ types: ['screen'], thumbnailSize: screenSize }).then(async sources => {
-            // let sourceId = sources[0].id;
-            return handleStream(sources[0].thumbnail.toDataURL());
-        })
-    } catch (e) {
-        console.log('error in startTakingScreenshots', e);
-    }
+    return new Promise((resolve, reject) => {
+        try {
+            console.log('---- going through the screenshot process ----')
+            let screenSize = screen.getPrimaryDisplay().workAreaSize;
+            desktopCapturer.getSources({ types: ['screen'], thumbnailSize: screenSize }).then(sources => {
+                // let sourceId = sources[0].id;
+                resolve(sources[0].thumbnail.toDataURL());
+            })
+                .catch(err => reject({ msg: 'error in startTakingScreenshots', error: err }))
+        } catch (e) {
+            reject({ msg: 'error in startTakingScreenshots', error: err });
+        }
+    })
 }
 
-const handleStream = async (stream) => {
-    var regex = /^data:.+\/(.+);base64,(.*)$/;
-    var matches = stream.match(regex);
-    var ext = matches[1];
-    var data = matches[2];
-    var buffer = Buffer.from(data, 'base64');
-    fs.writeFileSync(`${__dirname}/../../../public/screenshots/screenshot-${count++}.${ext}`, buffer, function (err) {
-        console.log('error in writing file', err);
+const handleStream = (data) => {
+    return new Promise(function (resolve, reject) {
+        //Replacing and writing the stream to a file
+        console.log('---- saving the image to directory ----')
+        data = data.replace(/^data:image\/png;base64,/, "");
+        fs.writeFile(`${__dirname}/../../../public/screenshots/screenshot-${count++}.png`, data, 'base64', function (err, data) {
+            if (err) {
+                console.log('error in writing file', err);
+                reject({ msg: 'error in writing file', err });
+            } else {
+                resolve('file saved')
+            }
+        })
     })
 }
 
 module.exports = {
-    startTakingScreenshots
+    startTakingScreenshots,
+    handleStream
 }

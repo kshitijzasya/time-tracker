@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { BasicLayout } from "../../components/layouts/basic";
 //import bootstrap components
 import {
+  Container,
+  Row,
   Form,
   Button,
 } from 'react-bootstrap';
@@ -16,26 +18,30 @@ const Login = _ => {
 
   let navigate = useNavigate();
 
-  const submitLoginForm = async(e) => {
+  const submitLoginForm = async (e) => {
     e.preventDefault();
-    
-    console.log(await Calls.GET('login'))
-    if ( email === '' || password === '' ) {
-      console.log('Please fill in all fields');
+
+    if (email === '' || password === '') {
+      alert('Please fill in all fields');
       return false;
     }
     //Send response for login
-    let response = await Calls.POST('login', {email, password}); console.log('response', response)
-    if (response.status === 200){
-      let { id } = response.data; 
-      authentication.userId = id;
+    let response = await Calls.POST('login', { email, password }); console.log('response', response)
+    if (response.success) {
+      let user = response.user;
+      authentication.userId = user.id;
+      authentication.user = user;
       navigate('/projects');
     }
   }
   return (
     <>
-      <div className="flex h-screen">
-          <Form className="m-auto rounded border-slate-300" onSubmit={submitLoginForm}>
+      <Container className="h-screen px-5 py-5">
+        <Row className="text-center">
+          <p>Login using HRM credentials</p>
+        </Row>
+        <Row>
+          <Form className="m-auto rounded border-slate-300 px-4 py-4" onSubmit={submitLoginForm}>
             <Form.Group className="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control type="email" placeholder="Enter email" onChange={e => setEmail(e.target.value)} />
@@ -50,7 +56,8 @@ const Login = _ => {
               </Button>
             </Form.Group>
           </Form>
-      </div>
+        </Row>
+      </Container>
     </>
   );
 };

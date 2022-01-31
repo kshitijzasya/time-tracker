@@ -1,38 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Row,
-    ListGroup
+    ListGroup,
+    Spinner
 } from 'react-bootstrap';
-import { BasicLayout } from '../../components/layouts/basic';
+import Calls from "../../../helpers/apicalls";
+import { AuthLayout } from '../../components/layouts/basic';
 import { Link } from 'react-router-dom';
-
-const projectsData = [
-    {
-        id: 1,
-        name: 'HRM',
-        description: 'Human Resource Management',
-    },
-    {
-        id: 2,
-        name: 'Biramedia',
-        description: 'Twilio call center for agents',
-    },
-    {
-        id: 3,
-        name: 'Deets',
-        description: 'Call washing for customers'
-    },
-    {
-        id: 4,
-        name: 'AltDash',
-        description: 'Crypto dashboard',
-    }
-];
+import authentication from '../../../helpers/authentication';
 
 const noDecorations = { textDecoration: 'none' };
 
 const Projects = _ => {
-    console.log('inside projects')
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(async _ => {
+        if (!projects.length) {
+            let id = authentication.userId || 77;
+            let response = await Calls.GET(`projects?user_id=${id}`);
+            if (response.status){
+                setProjects(response.projects);                
+            }
+        } else {
+            setLoading(false);
+        }
+    }, [projects]);
+    
+    if (loading) { 
+        return (
+            <div className="flex h-screen px-4">
+                <div className="m-auto rounded border-slate-300 min-w-[50%] text-center">
+                    <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <>
             <div className="flex h-screen px-4">
@@ -41,13 +47,16 @@ const Projects = _ => {
                     <Row>
                         <ListGroup>
                             {
-                                projectsData.map(project => {
-                                    return (
-                                        <Link to={`/projects/${project.id}`} key={project.id} style={noDecorations}>
-                                            <ListGroup.Item key={project.id}>{project.name}</ListGroup.Item>
-                                        </Link>
-                                    )
-                                })
+                                projects.length ?
+                                    projects.map(project => {
+                                        return (
+                                            <Link to={`/projects/${project.project_id}`} key={project.project_id} style={noDecorations}>
+                                                <ListGroup.Item key={project.project_id}>{project.project_name}</ListGroup.Item>
+                                            </Link>
+                                        )
+                                    })
+                                    :
+                                    <p>No project available</p>
                             }
 
                         </ListGroup>
@@ -58,4 +67,4 @@ const Projects = _ => {
     )
 }
 
-export default BasicLayout(Projects);
+export default AuthLayout(Projects);

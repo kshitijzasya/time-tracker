@@ -14,11 +14,23 @@ export default {
     GET: (url) => {
         return axios.get(`${API_URL}${url}`, {...defaultOptions})
             .then(response => response)
+            .then(res => {
+                if (res.status === 200) {
+                    return res.data
+                }
+                throw 'Not a valid response';
+            })
             .catch(error => ({'status': 'error', 'message': error}));
     },
     POST: (url, data) => {
         return axios.post(`${API_URL}${url}`, data, {...defaultOptions})
             .then(response => response)
+            .then(res => {
+                if (res.status === 200) {
+                    return res.data
+                }
+                throw 'Not a valid response';
+            })
             .catch(error => ({'status': 'error', 'message': error}))
     }
 };
