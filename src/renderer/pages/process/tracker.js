@@ -28,7 +28,7 @@ const Recorder = () => {
   }
   useEffect(_ => {
     console.log('----- inside useEffect -----', isRecording)
-    console.log('project id: ', id)
+    console.log('project id: ', id);
     //Set effects for the interval
   }, [])
   return (

@@ -1,6 +1,6 @@
-const { desktopCapturer, screen } = require('electron');
+const { desktopCapturer, screen, ipcMain } = require('electron');
 const fs = require('fs');
-const { upload } = require('../upload/aws')
+const { upload } = require('../upload/aws');
 /**
  * Start taking screenshots
  * @param type
@@ -44,6 +44,14 @@ const handleStream = (data, interval) => {
 const uploadFileToAwsAndDb = ( name , interval ) => {
     return new Promise(function (resolve, reject) {
         upload(name)
+        .then(location => {
+            console.log('---- file uploaded to aws ----', location)
+            //Upload to db hrm
+        })
+        .catch(err => {
+            console.log('error in uploadFileToAwsAndDb', err)
+            reject(err)
+        })
     })
 }
 

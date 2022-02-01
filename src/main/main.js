@@ -6,6 +6,7 @@ var screenshotInterval = 1;
 var screenCounter = 0;
 var counter;
 var intervalObject;
+var next_counter_interval = 0;
 
 function createWindow() {
   // Create the browser window.
@@ -58,18 +59,18 @@ app.on('activate', () => { console.log('env', process.env.API_URL)
 
 //Listener
 ipcMain.on('tracking:start', (event, arg) => {
-  screenshotInterval = 1;
+  screenshotInterval = 1; 
   runningCounter();
   event.reply('reply', 'pong')
 });
 
-function runningCounter(interval = 0) {
+function runningCounter() {
   if (screenshotInterval) {
     console.log('starting the process ----', interval)
-    startTrackProcess(interval);
-    let next_counter_interval = Math.floor(Math.random() * 10) + 1;
+    startTrackProcess(next_counter_interval);
+    next_counter_interval = Math.floor(Math.random() * 10) + 1;
     console.log('next counter interval', next_counter_interval)
-    setTimeout(runningCounter, next_counter_interval * 1000);
+    // setTimeout(runningCounter, next_counter_interval * 1000);
     console.log('inside running counter');
   } else {
     console.log('---- stopping the screenshot process ----')
