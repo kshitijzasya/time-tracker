@@ -10,25 +10,27 @@ import { Link, useParams } from "react-router-dom";
 //Renderer
 const renderer = window.ipcRenderer;
 
-const startRecording = _ => {
-  console.log('----- starting recording -----')
-  renderer.send('tracking:start', 'startRecording');
-}
-
-const stopRecording = _ => {
-  console.log('----- stoping recording -----')
-  renderer.send('tracking:stop', '');
-}
-
 const Recorder = () => {
-
   //Project-Id
   var id = useParams().id;
-  // useEffect(_ => {
+  const [ isRecording, setIsRecording ] = useState(false);
 
-  //   console.log('project id: ', id)
-  //   //Set effects for the interval
-  // }, [])
+  function startRecording(){
+    console.log('----- starting recording -----')
+    renderer.send('tracking:start', 'startRecording');
+    setIsRecording(true)
+  }
+
+  function stopRecording(){
+    console.log('----- stoping recording -----')
+    renderer.send('tracking:stop', '');
+    setIsRecording(false)
+  }
+  useEffect(_ => {
+    console.log('----- inside useEffect -----', isRecording)
+    console.log('project id: ', id)
+    //Set effects for the interval
+  }, [])
   return (
     <>
         <Row className="text-center">
@@ -39,8 +41,14 @@ const Recorder = () => {
             <Link to="/projects"><i className="fa fa-angle-left fa-3x" aria-hidden="true"></i></Link>
           </Col>
           <Col xs={8} md={8} className="text-right py-2">
-            <Button variant="primary" className="float-right" data-toggle="buttons" onClick={startRecording}>Start</Button>
-            <Button variant="danger" data-toggle="buttons" onClick={stopRecording}>Stop</Button>
+            {
+              isRecording 
+              ? 
+              <Button variant="danger" data-toggle="buttons" onClick={stopRecording}>Stop</Button>              
+              :
+              <Button variant="primary" className="float-right" data-toggle="buttons" onClick={startRecording}>Start</Button>
+            }           
+            
           </Col>
         </Row>
         <Row className="px-4 py-4">

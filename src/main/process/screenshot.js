@@ -1,9 +1,6 @@
 const { desktopCapturer, screen } = require('electron');
 const fs = require('fs');
-const path = require * ('path');
-const os = require('os');
-
-var count = 0;
+const { upload } = require('../upload/aws')
 /**
  * Start taking screenshots
  * @param type
@@ -24,19 +21,29 @@ const startTakingScreenshots = (type) => {
     })
 }
 
-const handleStream = (data) => {
+const handleStream = (data, interval) => {
     return new Promise(function (resolve, reject) {
         //Replacing and writing the stream to a file
         console.log('---- saving the image to directory ----')
         data = data.replace(/^data:image\/png;base64,/, "");
-        fs.writeFile(`${__dirname}/../../../public/screenshots/screenshot-${count++}.png`, data, 'base64', function (err, data) {
+        let timestamp = new Date().getTime();
+        let name = `Screeenshot-${timestamp}.png`;
+        fs.writeFile(`${__dirname}/../../../public/screenshots/${name}`, data, 'base64', function (err, data) {
             if (err) {
                 console.log('error in writing file', err);
                 reject({ msg: 'error in writing file', err });
             } else {
-                resolve('file saved')
+                resolve('file saved');
+                //Upload screenshot to AWS
+                uploadFileToAwsAndDb(name, interval);
             }
         })
+    })
+}
+
+const uploadFileToAwsAndDb = ( name , interval ) => {
+    return new Promise(function (resolve, reject) {
+        upload(name)
     })
 }
 

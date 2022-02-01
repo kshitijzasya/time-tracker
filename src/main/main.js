@@ -59,26 +59,28 @@ app.on('activate', () => { console.log('env', process.env.API_URL)
 //Listener
 ipcMain.on('tracking:start', (event, arg) => {
   screenshotInterval = 1;
-  intervalObject = setInterval(runningCounter, 2000)
+  runningCounter();
   event.reply('reply', 'pong')
 });
 
-async function runningCounter() {
+function runningCounter(interval = 0) {
   if (screenshotInterval) {
-    console.log('starting the process ----')
-    await startTrackProcess();
+    console.log('starting the process ----', interval)
+    startTrackProcess(interval);
+    let next_counter_interval = Math.floor(Math.random() * 10) + 1;
+    console.log('next counter interval', next_counter_interval)
+    setTimeout(runningCounter, next_counter_interval * 1000);
     console.log('inside running counter');
   } else {
-    clearInterval(intervalObject);
     console.log('---- stopping the screenshot process ----')
   }  
 }
 
-function startTrackProcess() {
+function startTrackProcess(interval = 0) {
   try {
     screenProcess.startTakingScreenshots()
     .then(dataStream => { 
-      screenProcess.handleStream(dataStream)
+      screenProcess.handleStream(dataStream, interval)
     });
   } catch (e) {
     console.log('error in setimmediate', e)
