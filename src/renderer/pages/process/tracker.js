@@ -5,6 +5,7 @@ import {
   Col
 } from "react-bootstrap";
 import { AuthLayout } from '../../components/layouts/basic';
+import authentication from '../../../helpers/authentication'; 
 import { Link, useParams } from "react-router-dom";
 
 //Renderer
@@ -15,20 +16,27 @@ const Recorder = () => {
   var id = useParams().id;
   const [ isRecording, setIsRecording ] = useState(false);
 
-  function startRecording(){
-    console.log('----- starting recording -----')
-    renderer.send('tracking:start', 'startRecording');
-    setIsRecording(true)
+  async function startRecording(){
+    //Invoking an event -- return  a promise
+    renderer.invoke('tracking:start', 'startRecording')
+    .then(r => console.log('response', r))
+    .catch(err => console.log('err', err))
+   
+    setIsRecording(true);
+    
   }
+  renderer.on('tracking:reply', (event, arg) => {
+    console.log('---- inside reply the event ----', arg)
+  })
 
-  function stopRecording(){
-    console.log('----- stoping recording -----')
-    renderer.send('tracking:stop', '');
+  async function stopRecording(){
+    await renderer.invoke('tracking:stop', '');
     setIsRecording(false)
   }
   useEffect(_ => {
     console.log('----- inside useEffect -----', isRecording)
-    console.log('project id: ', id);
+    console.log('project id: ', id || 3);
+    console.log('customer id: ', authentication.userId || 77);
     //Set effects for the interval
   }, [])
   return (

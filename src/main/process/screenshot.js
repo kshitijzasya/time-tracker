@@ -33,25 +33,21 @@ const handleStream = (data, interval) => {
                 console.log('error in writing file', err);
                 reject({ msg: 'error in writing file', err });
             } else {
-                resolve('file saved');
+                console.log('-- file is saved --')
                 //Upload screenshot to AWS
-                uploadFileToAwsAndDb(name, interval);
+                uploadFileToAwsAndDb(name, interval)
+                .then(res => resolve({ msg: 'file is saved', location: name, interval }))
+                .catch(err => reject({ msg: 'error in uploadFileToAwsAndDb', error: err }));
             }
         })
     })
 }
 
-const uploadFileToAwsAndDb = ( name , interval ) => {
+const uploadFileToAwsAndDb = ( name ) => {
     return new Promise(function (resolve, reject) {
         upload(name)
-        .then(location => {
-            console.log('---- file uploaded to aws ----', location)
-            //Upload to db hrm
-        })
-        .catch(err => {
-            console.log('error in uploadFileToAwsAndDb', err)
-            reject(err)
-        })
+        .then(location => resolve())
+        .catch(err => reject(err))
     })
 }
 

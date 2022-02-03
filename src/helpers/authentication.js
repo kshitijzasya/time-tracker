@@ -11,7 +11,7 @@ const authentication = {
         storage.setItem('id', JSON.stringify(value))
     },
     get userId() {
-        return this._id;
+        return JSON.parse(storage.getItem('user')).id;
     },
     set user(value) { 
         if (typeof value === 'object') {

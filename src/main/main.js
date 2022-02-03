@@ -3,9 +3,6 @@ const path = require('path');
 const screenProcess = require('./process/screenshot');
 
 var screenshotInterval = 1;
-var screenCounter = 0;
-var counter;
-var intervalObject;
 var next_counter_interval = 0;
 
 function createWindow() {
@@ -22,7 +19,6 @@ function createWindow() {
       contextIsolation: false
     }
   })
-  console.log('dirnme', path.join(__dirname, 'preload.js'))
   //load the index.html from a url
   win.loadURL('http://localhost:3000');
 
@@ -58,40 +54,47 @@ app.on('activate', () => { console.log('env', process.env.API_URL)
 
 
 //Listener
-ipcMain.on('tracking:start', (event, arg) => {
+ipcMain.handle('tracking:start', (event, arg) => {
   screenshotInterval = 1; 
-  runningCounter();
-  event.reply('reply', 'pong')
+  runningCounter(event);
+  return "pong"
 });
 
-function runningCounter() {
+function runningCounter(event) {
   if (screenshotInterval) {
-    console.log('starting the process ----', interval)
-    startTrackProcess(next_counter_interval);
+    //Starting the track process
+    startTrackProcess(event, next_counter_interval);
     next_counter_interval = Math.floor(Math.random() * 10) + 1;
-    console.log('next counter interval', next_counter_interval)
-    // setTimeout(runningCounter, next_counter_interval * 1000);
-    console.log('inside running counter');
+    //Starting tracking loop untill stopped
+    setTimeout(runningCounter, next_counter_interval * 1000, event);
   } else {
-    console.log('---- stopping the screenshot process ----')
+    //handling the stop event
   }  
 }
 
-function startTrackProcess(interval = 0) {
+function startTrackProcess(event, interval = 0) {
   try {
+    //Starting the screenshot process
     screenProcess.startTakingScreenshots()
     .then(dataStream => { 
+      //handle data stram to create image and upload to aws
       screenProcess.handleStream(dataStream, interval)
+      .then(response => {  console.log('--tracking reply--')
+        //Send location and interval to the main process
+        event.sender.send('tracking:reply', response);
+      })
+    })
+    .catch(err => {
+      throw new Error('Error in screenshot process')
     });
   } catch (e) {
     console.log('error in setimmediate', e)
   }
 }
 
-ipcMain.on('tracking:stop', (event, arg) => {
-  console.log('stoping', arg);
+ipcMain.handle('tracking:stop', (event, arg) => {
   screenshotInterval = 0;
-  event.returnValue = 'yes';
+  return true;
 });
 
 
