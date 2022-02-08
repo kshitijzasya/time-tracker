@@ -36,7 +36,7 @@ const handleStream = (data, interval) => {
                 console.log('-- file is saved --')
                 //Upload screenshot to AWS
                 uploadFileToAwsAndDb(name, interval)
-                .then(res => resolve({ msg: 'file is saved', location: name, interval }))
+                .then(res => resolve({ msg: 'file is saved', location: res, interval, name}))
                 .catch(err => reject({ msg: 'error in uploadFileToAwsAndDb', error: err }));
             }
         })
@@ -46,7 +46,7 @@ const handleStream = (data, interval) => {
 const uploadFileToAwsAndDb = ( name ) => {
     return new Promise(function (resolve, reject) {
         upload(name)
-        .then(location => resolve())
+        .then(location => resolve(location))
         .catch(err => reject(err))
     })
 }

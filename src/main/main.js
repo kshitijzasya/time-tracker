@@ -79,9 +79,9 @@ function startTrackProcess(event, interval = 0) {
     .then(dataStream => { 
       //handle data stram to create image and upload to aws
       screenProcess.handleStream(dataStream, interval)
-      .then(response => {  console.log('--tracking reply--')
+      .then(response => {  
         //Send location and interval to the main process
-        event.sender.send('tracking:reply', response);
+        event.sender.send('tracking:update', response);
       })
     })
     .catch(err => {
@@ -92,7 +92,7 @@ function startTrackProcess(event, interval = 0) {
   }
 }
 
-ipcMain.handle('tracking:stop', (event, arg) => {
+ipcMain.handle('tracking:stop', (event, arg) => { console.log(`---- Stop process ----`)
   screenshotInterval = 0;
   return true;
 });

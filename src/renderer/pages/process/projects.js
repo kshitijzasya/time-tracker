@@ -6,7 +6,7 @@ import {
 } from 'react-bootstrap';
 import Calls from "../../../helpers/apicalls";
 import { AuthLayout } from '../../components/layouts/basic';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import authentication from '../../../helpers/authentication';
 
 const noDecorations = { textDecoration: 'none' };
@@ -50,9 +50,9 @@ const Projects = _ => {
                                 projects.length ?
                                     projects.map(project => {
                                         return (
-                                            <Link to={`/projects/${project.project_id}`} key={project.project_id} style={noDecorations}>
-                                                <ListGroup.Item key={project.project_id}>{project.project_name}</ListGroup.Item>
-                                            </Link>
+                                            // <Link to={`/projects/${project.project_id}`} key={project.project_id} style={noDecorations}>
+                                                <ListGroup.Item key={project.project_id} >{project.project_name}</ListGroup.Item>
+                                            // </Link>
                                         )
                                     })
                                     :
