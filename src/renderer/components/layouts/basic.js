@@ -27,7 +27,7 @@ const AuthLayout = WrappedComponent => {
     return class extends React.Component {
         render() {
             return (
-                <Container>
+                <Container className="px-4 py-4">
                     <Row>
                         <Col>
                             <WrappedComponent {...this.props} />

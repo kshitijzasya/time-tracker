@@ -11,7 +11,7 @@ import Calls from "../../../helpers/apicalls";
 import { AuthLayout } from '../../components/layouts/basic';
 import authentication from '../../../helpers/authentication';
 import { Link, useParams } from "react-router-dom";
-// import Im from './screenshots/Screeenshot-1644314344074.png';
+import Storage from '../../../helpers/storage';
 
 //Renderer
 const renderer = window.ipcRenderer;
@@ -20,16 +20,34 @@ const renderer = window.ipcRenderer;
 const updateIntervalOnApi = async (params) => {
   let response = await Calls.POST('update-screenshot', params);
   if (response.status) {
-    return response.time
+    return response
   }
   throw Error('Not valid data')
 }
 
+//Handling time interval
+const sortTime = time => {
+  let result;
+  time = typeof time === 'string' ? parseInt(time) : time;
+  if (time > 60) {
+    result = (Math.floor(time / 60) >= 10 ? Math.floor(time / 60) : `0${Math.floor(time / 60)}`) + ':' + (time % 60 >= 10 ? time % 60 : `0${time % 60}`)
+  } else {
+    result = `00:${time >= 10 ? time : `0${time}`}`
+  }
+  return result;
+}
+
 const startRecordingProcess = async _ => {
   //Invoking an event -- return  a promise
-  await renderer.invoke('tracking:start', 'startRecording')
-    .then(r => console.log('response', r))
+  await renderer.invoke('tracking', 'start')
+    .then(r => r)
     .catch(err => console.log('err', err))
+}
+
+const stopRecordingProcess = async _ => {
+  //Invoking an event -- return  a promise
+  await renderer.invoke('tracking', 'stop');
+  await renderer.removeAllListeners('tracking')
 }
 
 const Recorder = React.memo(() => {
@@ -37,56 +55,65 @@ const Recorder = React.memo(() => {
   var id = useParams().id;
   var projectId = id || 3;
   var userId = authentication.userId || 77;
-  const [isRecording, setIsRecording] = useState(false);
-  const [screenshot, setScreenShot] = useState('Screeenshot-1644314344074.png');
-  const [timeRecord, setTimeRecord] = useState({ today: 0, total: 0 });
+  var project = Storage.project;
+  const [isRecording, setIsRecording] = useState(Storage.tracker);
+  const [screenshot, setScreenShot] = useState({ url: 'Screeenshot-1644390239599.png', time: 0 });
+  const [timeRecord, setTimeRecord] = useState({ today: '00', total: '00' });
 
   function startRecording() {
     startRecordingProcess()
     setIsRecording(true)
   }
 
-  async function stopRecording() {
-    await renderer.invoke('tracking:stop', '');
-    setIsRecording(false)
+  function stopRecording() {
+    stopRecordingProcess();
+    setIsRecording(false);
   }
   //Handling event
-  useEffect(_ => {
-    console.log('----- inside useEffect -----', isRecording)
-    console.log('project id: ', projectId);
-    console.log('customer id: ', userId);
+  useEffect(_ => { 
     //Set effects for the interval
-    renderer.on('tracking:update', (event, arg) => {
-      let { location, interval, name } = arg;
-      updateIntervalOnApi({ ...arg, projectId, userId })
-        .then(time => setTimeRecord(time))
-        .catch(err => console.log('error', err))
-      setScreenShot(name);
-      console.log('---- inside start the event ----', arg)
+    renderer.on('tracking', (event, arg) => {
+      if (arg.type === 'update') {
+        let { name } = arg;
+        updateIntervalOnApi({ ...arg, projectId, userId })
+          .then(res => setTimeRecord(res.time))
+          .catch(err => console.log('error', err))
+        setScreenShot({ url: name, time: arg.interval });
+      }
     })
   }, []);
 
   useEffect(_ => {
     updateIntervalOnApi({ projectId, userId })
-      .then(time => setTimeRecord(time))
+      .then(res => {
+        setTimeRecord(res.time)
+        setScreenShot({ url: res.name, time: 0 })
+      })
       .catch(err => console.log('error', err))
-  }, [])
+  }, []);
+
+  //Setting recording related data
+  useEffect(_ => {
+    Storage.tracker = isRecording ?? false;
+  }, [isRecording]);
+  
+  //Returning the jsx
   return (
     <>
       <Row className="text-center">
-        <p>Screen Capturer</p>
+        <h2>{project.project_name}</h2>
       </Row>
       <Row>
-        <Col xs={4} md={4} className="text-center py-2">
-          <Link to="/projects"><i className="fa fa-angle-left fa-3x" aria-hidden="true"></i></Link>
+        <Col xs={4} md={4} className="text-left py-2">
+          <Link to="/projects"><i className="fa fa-angle-left fa-2x" aria-hidden="true"></i></Link>
         </Col>
         <Col xs={8} md={8} className="text-right py-2">
           {
             isRecording
               ?
-              <Button variant="danger" data-toggle="buttons" onClick={stopRecording}>Stop</Button>
+              <Button variant="light" data-toggle="buttons" onClick={stopRecording}><i className="fa fa-stop fa-2x" aria-hidden="true"></i></Button>
               :
-              <Button variant="primary" className="float-right" data-toggle="buttons" onClick={startRecording}>Start</Button>
+              <Button variant="light" className="float-right" data-toggle="buttons" onClick={startRecording}><i className="fa fa-play fa-2x" aria-hidden="true"></i></Button>
           }
 
         </Col>
@@ -99,15 +126,18 @@ const Recorder = React.memo(() => {
       </Row>
       <Row className="py-4">
         <Col>
-          <p>Content area</p>
-          <Image src={`./screenshots/${screenshot}`} fluid />
+          <h5>Content area</h5>
+          <Image src={`./screenshots/${screenshot.url}`} fluid />
+          <h6 className="text-center py-2">{screenshot.time} minutes ago</h6>
         </Col>
         <Col>
-          <Row>
-            <h3>Today: &nbsp;&nbsp;<Badge>00:{timeRecord.today}</Badge></h3>
+          <Row className="text-center">
+            <h4>Today ({['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][(new Date).getDay()].substring(0, 3)})</h4>
+            <h4>{sortTime(timeRecord.today)}</h4>
           </Row>
-          <Row>
-            <h3>Total:&nbsp;&nbsp;&nbsp;&nbsp;<Badge>00:{timeRecord.total}</Badge></h3>
+          <Row className="text-center">
+            <h4>This Week</h4>
+            <h4>{sortTime(timeRecord.total)}</h4>
           </Row>
         </Col>
       </Row>

@@ -54,10 +54,17 @@ app.on('activate', () => { console.log('env', process.env.API_URL)
 
 
 //Listener
-ipcMain.handle('tracking:start', (event, arg) => {
-  screenshotInterval = 1; 
-  runningCounter(event);
-  return "pong"
+ipcMain.handle('tracking', (event, arg) => {
+  if ( arg === 'start' ) {
+    screenshotInterval = 1; 
+    runningCounter(event);
+    return "pong"
+  } else if( arg === 'stop' ) {
+    console.log(`---- Stop process ----`)
+    screenshotInterval = 0;
+    return true;
+  }
+  
 });
 
 function runningCounter(event) {
@@ -81,7 +88,7 @@ function startTrackProcess(event, interval = 0) {
       screenProcess.handleStream(dataStream, interval)
       .then(response => {  
         //Send location and interval to the main process
-        event.sender.send('tracking:update', response);
+        event.sender.send('tracking', {...response, type: 'update'});
       })
     })
     .catch(err => {
@@ -91,11 +98,6 @@ function startTrackProcess(event, interval = 0) {
     console.log('error in setimmediate', e)
   }
 }
-
-ipcMain.handle('tracking:stop', (event, arg) => { console.log(`---- Stop process ----`)
-  screenshotInterval = 0;
-  return true;
-});
 
 
 //Handle unhandled rejections

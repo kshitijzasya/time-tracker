@@ -8,12 +8,22 @@ import Calls from "../../../helpers/apicalls";
 import { AuthLayout } from '../../components/layouts/basic';
 import { Link, useNavigate } from 'react-router-dom';
 import authentication from '../../../helpers/authentication';
+import Storage from '../../../helpers/storage';
 
 const noDecorations = { textDecoration: 'none' };
 
 const Projects = _ => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    var navigate = useNavigate();
+
+    //Selecting project
+    function selectProject(id) {
+        //Navigate to project
+        Storage.project = projects.find(p => p.project_id === id);
+        navigate(`/process/project/${id}`);
+    }
 
     useEffect(async _ => {
         if (!projects.length) {
@@ -51,7 +61,7 @@ const Projects = _ => {
                                     projects.map(project => {
                                         return (
                                             // <Link to={`/projects/${project.project_id}`} key={project.project_id} style={noDecorations}>
-                                                <ListGroup.Item key={project.project_id} >{project.project_name}</ListGroup.Item>
+                                                <ListGroup.Item key={project.project_id} onClick={_ => selectProject(project.project_id)}>{project.project_name}</ListGroup.Item>
                                             // </Link>
                                         )
                                     })
