@@ -28,6 +28,7 @@ const handleStream = (data, interval) => {
         data = data.replace(/^data:image\/png;base64,/, "");
         let timestamp = new Date().getTime();
         let name = `Screeenshot-${timestamp}.png`;
+        // resolve({ msg: 'file is saved', location: 'asa', interval, name})
         fs.writeFile(`${__dirname}/../../../public/screenshots/${name}`, data, 'base64', function (err, data) {
             if (err) {
                 console.log('error in writing file', err);

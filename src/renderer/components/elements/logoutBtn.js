@@ -9,7 +9,7 @@ export default function(props) {
     let navigate = useNavigate();
     function logout() {
         Authentication.logout();
-        navigate('/login');
+        // navigate('/login');
     }
     //Renderer
     return (

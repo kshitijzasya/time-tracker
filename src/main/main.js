@@ -16,7 +16,7 @@ function createWindow() {
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),
       // enableRemoteModule:true,
-      contextIsolation: false
+      contextIsolation: true
     }
   })
   //load the index.html from a url
@@ -40,7 +40,7 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('activate', () => { console.log('env', process.env.API_URL)
+app.on('activate', () => { 
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
 
@@ -58,13 +58,11 @@ ipcMain.handle('tracking', (event, arg) => {
   if ( arg === 'start' ) {
     screenshotInterval = 1; 
     runningCounter(event);
-    return "pong"
   } else if( arg === 'stop' ) {
     console.log(`---- Stop process ----`)
     screenshotInterval = 0;
-    return true;
   }
-  
+  return "reply"
 });
 
 function runningCounter(event) {

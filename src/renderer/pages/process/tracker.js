@@ -14,7 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import Storage from '../../../helpers/storage';
 
 //Renderer
-const renderer = window.ipcRenderer;
+const renderer = window.ipc;
 
 //Update api screenshot
 const updateIntervalOnApi = async (params) => {
@@ -39,18 +39,17 @@ const sortTime = time => {
 
 const startRecordingProcess = async _ => {
   //Invoking an event -- return  a promise
-  await renderer.invoke('tracking', 'start')
-    .then(r => r)
-    .catch(err => console.log('err', err))
+  let reply = await renderer.invoke('tracking', 'start')
+  console.log('reply', reply)
 }
 
 const stopRecordingProcess = async _ => {
   //Invoking an event -- return  a promise
   await renderer.invoke('tracking', 'stop');
-  await renderer.removeAllListeners('tracking')
+  // await renderer.removeAllListeners('tracking')
 }
 
-const Recorder = React.memo(() => {
+const Recorder = React.memo(() => { 
   //Project-Id
   var id = useParams().id;
   var projectId = id || 3;
@@ -72,13 +71,15 @@ const Recorder = React.memo(() => {
   //Handling event
   useEffect(_ => { 
     //Set effects for the interval
-    renderer.on('tracking', (event, arg) => {
+    renderer.on('tracking', (event, arg) => { console.log('on updarte', arg)
       if (arg.type === 'update') {
         let { name } = arg;
-        updateIntervalOnApi({ ...arg, projectId, userId })
-          .then(res => setTimeRecord(res.time))
-          .catch(err => console.log('error', err))
-        setScreenShot({ url: name, time: arg.interval });
+        // updateIntervalOnApi({ ...arg, projectId, userId })
+        //   .then(res => {
+        //     setTimeRecord(res.time)
+        //   })
+        //   .catch(err => console.log('error', err))
+        // setScreenShot({ url: name, time: arg.interval });
       }
     })
   }, []);

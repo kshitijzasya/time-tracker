@@ -11,7 +11,7 @@ const authentication = {
         storage.setItem('id', JSON.stringify(value))
     },
     get userId() {
-        return JSON.parse(storage.getItem('user')).id;
+        return JSON.parse(storage.getItem('user'))?.id;
     },
     set user(value) { 
         if (typeof value === 'object') {
@@ -22,7 +22,7 @@ const authentication = {
         return JSON.parse(storage.getItem('user'))
     },
     get userName() { 
-        return JSON.parse(storage.getItem('user')).name
+        return JSON.parse(storage.getItem('user'))?.name
     },
     logout: function() { 
         storage.removeItem('id');
