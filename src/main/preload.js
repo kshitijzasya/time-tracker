@@ -1,7 +1,7 @@
 //Global setting renderer
 // window.ipcRenderer = require('electron').ipcRenderer;
 const { ipcRenderer, contextBridge } = require('electron');
-const validChannels = ['tracking'];
+const validChannels = ['tracking', 'close'];
 
 contextBridge.exposeInMainWorld(
     'ipc',
@@ -18,7 +18,7 @@ contextBridge.exposeInMainWorld(
         },
         on: (channel, callback) => {
             if (validChannels.includes(channel)) {
-                const newCallback = (_, data) => callback(data)
+                const newCallback = (_, data) => callback(data);
                 ipcRenderer.on(channel, newCallback)
             }
         },

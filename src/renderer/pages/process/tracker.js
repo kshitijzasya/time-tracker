@@ -71,7 +71,7 @@ const Recorder = React.memo(() => {
   //Handling event
   useEffect(_ => { 
     //Set effects for the interval
-    renderer.on('tracking', (event, arg) => { console.log('on updarte', arg)
+    renderer.on('tracking', arg => { console.log('on updarte', arg)
       if (arg.type === 'update') {
         let { name } = arg;
         // updateIntervalOnApi({ ...arg, projectId, userId })
@@ -81,7 +81,10 @@ const Recorder = React.memo(() => {
         //   .catch(err => console.log('error', err))
         // setScreenShot({ url: name, time: arg.interval });
       }
-    })
+    });
+    renderer.on('close', arg => { console.log('close', arg)
+        console.log('remove everything', renderer.removeAllListeners('tracking'))
+    })  
   }, []);
 
   useEffect(_ => {
