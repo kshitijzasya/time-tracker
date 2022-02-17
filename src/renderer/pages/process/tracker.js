@@ -49,7 +49,7 @@ const stopRecordingProcess = async _ => {
   // await renderer.removeAllListeners('tracking')
 }
 
-const Recorder = React.memo(() => { 
+const Recorder = () => { 
   //Project-Id
   var id = useParams().id;
   var projectId = id || 3;
@@ -74,12 +74,12 @@ const Recorder = React.memo(() => {
     renderer.on('tracking', arg => { console.log('on updarte', arg)
       if (arg.type === 'update') {
         let { name } = arg;
-        // updateIntervalOnApi({ ...arg, projectId, userId })
-        //   .then(res => {
-        //     setTimeRecord(res.time)
-        //   })
-        //   .catch(err => console.log('error', err))
-        // setScreenShot({ url: name, time: arg.interval });
+        updateIntervalOnApi({ ...arg, projectId, userId })
+          .then(res => {
+            setTimeRecord(res.time)
+          })
+          .catch(err => console.log('error', err))
+        setScreenShot({ url: name, time: arg.interval });
       }
     });
     renderer.on('close', arg => { console.log('close', arg)
@@ -100,6 +100,10 @@ const Recorder = React.memo(() => {
   useEffect(_ => {
     Storage.tracker = isRecording ?? false;
   }, [isRecording]);
+
+  useEffect(_ => {
+    console.log('screenshot changed', screenshot)
+  },[screenshot])
   
   //Returning the jsx
   return (
@@ -147,6 +151,6 @@ const Recorder = React.memo(() => {
       </Row>
     </>
   );
-});
+};
 
-export default AuthLayout(Recorder);
+export default AuthLayout(React.memo(Recorder))

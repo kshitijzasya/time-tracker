@@ -11,6 +11,7 @@ function createWindow() {
     width: 800,
     height: 600,
     title: "Time Tracker",
+    icon: path.join(__dirname, '../../public/home-icon.png'),
     // frame: false, // remove the window frame
     webPreferences: {
       nodeIntegration: true,
@@ -53,7 +54,7 @@ app.on('close', (e) => {
   console.log({app,win})
   if (app) {
     e.preventDefault();
-    app.webContents.send('close');
+    app.quit();
   }
 })
 
