@@ -23,34 +23,31 @@ const startTakingScreenshots = (type) => {
 
 const handleStream = (data, interval) => {
     return new Promise(function (resolve, reject) {
-        //Replacing and writing the stream to a file
-        console.log('---- saving the image to directory ----')
-        data = data.replace(/^data:image\/png;base64,/, "");
-        let timestamp = new Date().getTime();
-        let name = `Screeenshot-${timestamp}.png`;
-        // resolve({ msg: 'file is saved', location: 'asa', interval, name})
-        var res = fs.writeFileSync(`${__dirname}/../../../public/screenshots/${name}`, data, 'base64') 
-        resolve({ msg: 'file is saved', location: res, interval, name})
-        // function (err, data) {
-        //     if (err) {
-        //         console.log('error in writing file', err);
-        //         reject({ msg: 'error in writing file', err });
-        //     } else {
-        //         console.log('-- file is saved --')
-        //         //Upload screenshot to AWS
-        //         uploadFileToAwsAndDb(name, interval)
-        //         .then(res => resolve({ msg: 'file is saved', location: res, interval, name}))
-        //         .catch(err => reject({ msg: 'error in uploadFileToAwsAndDb', error: err }));
-        //     }
-        // })
+        try {
+            //Replacing and writing the stream to a file
+            console.log('---- saving the image to directory ----')
+            data = data.replace(/^data:image\/png;base64,/, "");
+            let timestamp = new Date().getTime();
+            let name = `Screeenshot-${timestamp}.png`;
+
+            //saving image to file
+            fs.writeFileSync(`${__dirname}/../../../public/screenshots/${name}`, data, 'base64');
+
+            //Upload screenshot to AWS
+            uploadFileToAwsAndDb(name, interval)
+                .then(res => resolve({ msg: 'file is saved', location: res, interval, name }))
+                .catch(err => reject({ msg: 'error in uploadFileToAwsAndDb', error: err }));
+        } catch (err) {
+            reject({ msg: 'error in writing file', err });
+        }
     })
 }
 
-const uploadFileToAwsAndDb = ( name ) => {
+const uploadFileToAwsAndDb = (name) => {
     return new Promise(function (resolve, reject) {
         upload(name)
-        .then(location => resolve(location))
-        .catch(err => reject(err))
+            .then(location => resolve(location))
+            .catch(err => reject(err))
     })
 }
 

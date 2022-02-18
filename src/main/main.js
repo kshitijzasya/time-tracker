@@ -19,8 +19,9 @@ function createWindow() {
       // enableRemoteModule:true,
       contextIsolation: true
     }
-  })
+  });
   //load the index.html from a url
+  // win.loadFile('./build/index.html');
   win.loadURL('http://localhost:3000');
 
   // Open the DevTools.

@@ -61,7 +61,7 @@ const Projects = _ => {
                                     projects.map(project => {
                                         return (
                                             // <Link to={`/projects/${project.project_id}`} key={project.project_id} style={noDecorations}>
-                                                <ListGroup.Item key={project.project_id} onClick={_ => selectProject(project.project_id)}>{project.project_name}</ListGroup.Item>
+                                                <ListGroup.Item key={project.project_id} onClick={_ => selectProject(project.project_id)}>{project?.project_name}</ListGroup.Item>
                                             // </Link>
                                         )
                                     })
