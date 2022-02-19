@@ -6,13 +6,7 @@ import { Firebase } from "./api";
 const settings = {timestampsInSnapshots: true};
 
 // Your web app's Firebase configuration
-const firebaseConfig = { Firebase};
-console.log('Firebase', {firebaseConfig, apiKey: "AIzaSyBWWl8pSvQhGC-07C0IAfqlwnrM4O5GI_E",
-authDomain: "hrmtracker-696e0.firebaseapp.com",
-projectId: "hrmtracker-696e0",
-storageBucket: "hrmtracker-696e0.appspot.com",
-messagingSenderId: "916301243842",
-appId: "1:916301243842:web:000561b75b44979c1ca25b"})
+const firebaseConfig = { ...Firebase};
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 

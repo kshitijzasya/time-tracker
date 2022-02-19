@@ -6,7 +6,7 @@ const validChannels = ['tracking', 'close'];
 contextBridge.exposeInMainWorld(
     'ipc',
     {
-        send:(channel, data) => {
+        send:(channel, data) => { console.log('inside send', {channel, data})
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data)
             }

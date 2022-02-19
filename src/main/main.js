@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const screenProcess = require('./process/screenshot');
 
@@ -62,18 +62,48 @@ app.on('close', (e) => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-
-//Listener
-ipcMain.handle('tracking', (event, arg) => {
-  if ( arg === 'start' ) {
+var eventHandler = {
+  start: (event, arg) => {
     screenshotInterval = 1; 
     runningCounter(event);
-  } else if( arg === 'stop' ) {
+  },
+  stop: (event, arg) => {
     console.log(`---- Stop process ----`)
     screenshotInterval = 0;
+  },
+  screenshot: (event, {name}) => {
+    if (name) {
+      var screenshotWindow = new BrowserWindow({
+        show: false,
+        width: 350,
+        height: 200,
+        title: name,
+        alwaysOnTop: true,
+        x: screen.getPrimaryDisplay().bounds.width - 320,
+        y: 50,
+        frame: false
+      });
+      screenshotWindow.setMenuBarVisibility(false);
+      let filepath = path.join(__dirname, `../../public/screenshots/${name}`);
+      let imagePath = `File://${filepath}`;
+      screenshotWindow.loadURL(imagePath);
+      screenshotWindow.once('ready-to-show', () => {
+        screenshotWindow.show()
+      });
+  
+      setTimeout(_=> {
+        screenshotWindow.close();
+      }, 4000);
+    }    
   }
+}
+
+//Listener
+ipcMain.handle('tracking', (event, arg) => { 
+  eventHandler[arg.type](event, arg);
   return "reply"
 });
+
 
 function runningCounter(event) {
   if (screenshotInterval) {

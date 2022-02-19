@@ -15,20 +15,19 @@ import { Screenshot, Time, Description, Toggle } from '../../components/tracker'
 //Renderer
 const renderer = window.ipc;
 
-
 //Update api screenshot
-const updateIntervalOnApi = async (params) => { console.log('params', params)
+const updateIntervalOnApi = async (params) => { 
   // let result = await addDoc(collection(db, 'screenshots'), {
   //   created_at: Timestamp.now(),
   //   interval: params.interval,
   //   project_member_id: params.project_member_id,
   //   screenshot_link: params.name,
   // })
-  // let response = await Calls.POST('update-screenshot', params);
-  // if (response.status) {
-  //   return response
-  // }
-  // throw Error('Not valid data')
+  let res = await renderer.invoke('tracking', {
+    type:'screenshot',
+    name: params.name,
+  })
+  return {time: { today: '00', total: '00' }};
 }
 
 const Recorder = () => {
@@ -50,8 +49,8 @@ const Recorder = () => {
       console.log('on updarte', arg)
       if (arg.type === 'update') {
         let { name } = arg;
-        updateIntervalOnApi({ ...arg, projectId, userId })
-          .then(res => {
+        updateIntervalOnApi({ ...arg, projectId, userId, name })
+          .then(res => { console.log('res', res) 
             setTimeRecord(res.time)
           })
           .catch(err => console.log('error', err))
@@ -65,10 +64,10 @@ const Recorder = () => {
   }, []);
 
   useEffect(_ => {
-    updateIntervalOnApi({ projectId, userId })
-      .then(res => {
-        setTimeRecord(res.time)
-        setScreenShot({ url: res.name, time: 0 })
+    updateIntervalOnApi({ projectId, userId, name:'' })
+      .then(res => { 
+        setTimeRecord(res ? res.time : { today: '00', total: '00' })
+        setScreenShot({ url: res?.name, time: 0 })
       })
       .catch(err => console.log('error', err))
   }, []);
@@ -80,6 +79,7 @@ const Recorder = () => {
 
   useEffect(_ => {
     Storage.tracker = isRecording ?? false;
+    console.log('isRecording changed', {storage: Storage.tracker, isRecording})
   }, [isRecording]);
   //Returning the jsx
   return (

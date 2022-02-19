@@ -1,4 +1,4 @@
-const { desktopCapturer, screen, ipcMain } = require('electron');
+const { desktopCapturer, screen } = require('electron');
 const fs = require('fs');
 const { upload } = require('../upload/aws');
 /**

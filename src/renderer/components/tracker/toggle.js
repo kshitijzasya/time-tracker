@@ -9,12 +9,12 @@ const renderer = window.ipc;
 
 const startRecordingProcess = async _ => {
     //Invoking an event -- return  a promise
-    let reply = await renderer.invoke('tracking', 'start')
+    let reply = await renderer.invoke('tracking', { type: 'start' })
 }
 
 const stopRecordingProcess = async _ => {
     //Invoking an event -- return  a promise
-    await renderer.invoke('tracking', 'stop');
+    await renderer.invoke('tracking', { type: 'stop' });
     // await renderer.removeAllListeners('tracking')
 }
 
